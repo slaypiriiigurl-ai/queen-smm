@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIVAZ SMM</title>
+<style>
+body {
+  background:#130d19;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  padding:20px;
+}
+h1 {color:#ff80c5;letter-spacing:3px}
+.card {
+  background:#24182c;
+  border:1px solid #59334f;
+  border-radius:16px;
+  padding:20px;
+  margin:15px 0;
+}
+input,select,button {
+  box-sizing:border-box;
+  width:100%;
+  padding:13px;
+  margin:8px 0;
+  border-radius:9px;
+  border:1px solid #754665;
+}
+button {
+  background:#ff80c5;
+  color:#291324;
+  font-weight:bold;
+  border:0;
+}
+small {color:#c8aabd}
+</style>
+</head>
+<body>
+<h1>DIVAZ SMM</h1>
+<small>FREE SOCIAL MEDIA PANEL</small>
+
+<div class="card">
+<h2>Dashboard</h2>
+<p>Available credits: <b id="credits">100</b></p>
+<button onclick="claim()">Claim daily +20 credits</button>
+</div>
+
+<div class="card">
+<h2>Instagram campaign</h2>
+<input id="username" placeholder="Instagram profile URL">
+<select id="size">
+<option value="10">10 community discoveries</option>
+<option value="25">25 community discoveries</option>
+<option value="50">50 community discoveries</option>
+</select>
+<button onclick="order()">Create campaign</button>
+<p id="message"></p>
+</div>
+
+<div class="card">
+<h2>Order history</h2>
+<div id="history">No orders yet.</div>
+</div>
+
+<script>
+let credits = Number(localStorage.credits || 100);
+let orders = JSON.parse(localStorage.orders || "[]");
+
+function render() {
+ document.getElementById("credits").textContent=credits;
+ document.getElementById("history").innerHTML=
+ orders.map(x=>"<p>"+x+"</p>").join("") || "No orders yet.";
+}
+
+function claim() {
+ let today=new Date().toDateString();
+ if(localStorage.claimed===today) {
+  alert("Already claimed today!");
+  return;
+ }
+ credits+=20;
+ localStorage.credits=credits;
+ localStorage.claimed=today;
+ render();
+}
+
+function order() {
+ let url=document.getElementById("username").value.trim();
+ let size=Number(document.getElementById("size").value);
+ let cost={10:20,25:45,50:85}[size];
+
+ if(!/^https:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._]+\/?$/.test(url)) {
+  alert("Enter a valid Instagram profile link.");
+  return;
+ }
+ if(credits<cost) {
+  alert("Not enough credits!");
+  return;
+ }
+ credits-=cost;
+ localStorage.credits=credits;
+ orders.push(size+" discovery campaign: "+url);
+ localStorage.orders=JSON.stringify(orders);
+ document.getElementById("message").textContent="Campaign request saved!";
+ render();
+}
+render();
+</script>
+</body>
+</html>
